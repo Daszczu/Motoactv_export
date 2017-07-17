@@ -91,7 +91,7 @@ public class DatabaseManager {
                     long timeDiff = time - timePrev;
                     double secTimeDiff = timeDiff / 1000D;
 
-                    cadence = stepsDiff / secTimeDiff * 60;
+                    cadence = stepsDiff / secTimeDiff * 60 / 2;
                 }
 //                cadence = steps / (time - startTime) * 1000D * 60;
                 timePrev = time;
@@ -121,7 +121,7 @@ public class DatabaseManager {
 //        if (heartRateSize != 0)
 //            avgHeart /= heartRateSize;
         if (cadenceSize != 0)
-            avgCadence /= cadenceSize;
+            avgCadence /= cadenceSize / 2;
 
         woa.setAvgCadence(avgCadence);
 //        woa.setAvgHeartRate(avgHeart);
