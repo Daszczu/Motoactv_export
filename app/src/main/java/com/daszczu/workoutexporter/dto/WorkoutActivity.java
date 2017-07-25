@@ -20,6 +20,9 @@ public class WorkoutActivity {
     private double duration;
     private List<Trackpoint> trackpoints;
 
+    public WorkoutActivity() {
+    }
+
     public WorkoutActivity(int id, long startTime, long endTime, int typeId, String type) {
         this.id = id;
         this.startTime = startTime;

@@ -13,15 +13,14 @@ import java.util.List;
 import static com.daszczu.workoutexporter.constants.Metrics.*;
 
 public class DatabaseManager {
-    public static final Uri CONTENT_URI_LAP_DETAILS = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/lap_details");
-    public static final Uri CONTENT_URI_WORKOUT_DATA = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/workout_data");
-    public static final Uri CONTENT_URI_LAST_WORKOUT = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/workout_last_details");
-    public static final Uri CONTENT_URI_APGX = Uri.parse("content://com.motorola.gault.activity.providers.workoutrawcontentprovider/workout_activity_apgx");
+    private static final Uri CONTENT_URI_LAP_DETAILS = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/lap_details");
+    private static final Uri CONTENT_URI_WORKOUT_DATA = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/workout_data");
+    private static final Uri CONTENT_URI_LAST_WORKOUT = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/workout_last_details");
+    private static final Uri CONTENT_URI_APGX = Uri.parse("content://com.motorola.gault.activity.providers.workoutrawcontentprovider/workout_activity_apgx");
     //public static final Uri CONTENT_URI_WORKOUT_ACTIVITY = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/view_workout_activity");
-    public static final Uri CONTENT_URI_WORKOUT_ACTIVITY = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/workout_activity");
-    public static final Uri CONTENT_URI_WORKOUT_ACTIVITY_SUMMARY = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/workout_activity_summary");
-    public static final Uri CONTENT_URI_WORKOUT_SUB_ACTIVITY = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/workout_sub_activity");
-
+    private static final Uri CONTENT_URI_WORKOUT_ACTIVITY = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/workout_activity");
+    private static final Uri CONTENT_URI_WORKOUT_ACTIVITY_SUMMARY = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/workout_activity_summary");
+    private static final Uri CONTENT_URI_WORKOUT_SUB_ACTIVITY = Uri.parse("content://com.motorola.gault.activity.providers.summarycontentprovider/workout_sub_activity");
 
     private ContentResolver CR;
 
@@ -29,14 +28,17 @@ public class DatabaseManager {
         this.CR = CR;
     }
 
-    public WorkoutActivity getWorkoutBaseInfo(int id) {
+    private WorkoutActivity getWorkoutBaseInfo(int id) {
         Cursor cursor;
         if (id == 0)
             cursor = this.CR.query(CONTENT_URI_WORKOUT_ACTIVITY, null, "", null, "_id desc");
         else
             cursor = this.CR.query(CONTENT_URI_WORKOUT_ACTIVITY, null, "_id = " + id, null, null);
 
-        cursor.moveToNext();
+        if (cursor != null && cursor.getCount() > 0)
+            cursor.moveToNext();
+        else
+            return new WorkoutActivity();
 
         id = getInt(cursor, "_id");
         long startTime = getLong(cursor, "start_time");
@@ -55,11 +57,17 @@ public class DatabaseManager {
     }
 
     public double getMetric(int workoutId, int metricId) {
-        Cursor csum = CR.query(CONTENT_URI_WORKOUT_ACTIVITY_SUMMARY, null,
+        Cursor cursor = CR.query(CONTENT_URI_WORKOUT_ACTIVITY_SUMMARY, null,
                 "workout_activity_id = " + workoutId + " and metric_id = " + metricId, null, null);
-        csum.moveToNext();
-        double dMetric = getDouble(csum, "summary_value");
-        csum.close();
+
+        if (cursor != null && cursor.getCount() > 0)
+            cursor.moveToNext();
+        else
+            return 0;
+
+        cursor.moveToNext();
+        double dMetric = getDouble(cursor, "summary_value");
+        cursor.close();
         return dMetric;
     }
 
@@ -74,6 +82,12 @@ public class DatabaseManager {
         long timePrev = 0;
         List<Trackpoint> trackPoints = new ArrayList<>();
         Cursor cursor = this.CR.query(CONTENT_URI_APGX, null, "time_of_day >= " + startTime + " and time_of_day <= " + endTime, null, null);
+
+        if (cursor != null && cursor.getCount() > 0)
+            cursor.moveToNext();
+        else
+            return null;
+
         while (cursor.moveToNext()) {
             long id = getLong(cursor, "_id");
             long time = getLong(cursor, "time_of_day");
@@ -121,7 +135,7 @@ public class DatabaseManager {
 //        if (heartRateSize != 0)
 //            avgHeart /= heartRateSize;
         if (cadenceSize != 0)
-            avgCadence /= cadenceSize / 2;
+            avgCadence /= cadenceSize;
 
         woa.setAvgCadence(avgCadence);
 //        woa.setAvgHeartRate(avgHeart);
