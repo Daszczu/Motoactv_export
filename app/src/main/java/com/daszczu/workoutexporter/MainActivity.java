@@ -1,11 +1,14 @@
 package com.daszczu.workoutexporter;
 
+import android.app.Activity;
 import android.content.Context;
-import android.database.Cursor;
+import android.content.Intent;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
@@ -14,21 +17,30 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
 import com.daszczu.workoutexporter.async.WorkoutSync;
+import com.daszczu.workoutexporter.dto.WorkoutActivity;
 import com.daszczu.workoutexporter.managers.DatabaseManager;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-
-import static com.daszczu.workoutexporter.constants.Metrics.METRIC_DISTANCE;
-
-public class MainActivity extends AppCompatActivity {
-    private DateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.getDefault());
+public class MainActivity extends Activity {
     private String TAG = "EXPORTER";
     private DatabaseManager dbClient;
+    private final static int LAST_WORKOUTS = 5;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.my_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.open_plannedworkoutactivity:
+                openPlannedWorkoutsActivity();
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
 
     @Override
     protected void onStop() {
@@ -41,51 +53,31 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         dbClient = new DatabaseManager(getContentResolver());
-        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
+//        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
         super.onCreate(savedInstanceState);
-        this.setContentView(R.layout.activity_main);
+        this.setContentView(R.layout.activity_main2);
 
-        List<String> workoutLabels = getListLabels();
-        setListLabels(workoutLabels);
+        setListLabels();
     }
-
-    private List<String> getListLabels() {
-        List<String> options = new ArrayList<>();
-        Cursor workoutCursor = getContentResolver().query(DatabaseManager.CONTENT_URI_WORKOUT_ACTIVITY, null, "", null, null);
-        if (workoutCursor == null)
-            return options;
-
-        while (workoutCursor.moveToNext()) {
-            int id = workoutCursor.getInt(workoutCursor.getColumnIndex("_id"));
-            double dDistance = dbClient.getMetric(id, METRIC_DISTANCE)/1000;
-            String sDistance = String.format(Locale.getDefault(), "%.2fkm", dDistance);
-
-            options.add(id + " " + df.format(workoutCursor.getLong(workoutCursor.getColumnIndex("start_time"))) + " " + sDistance);
-        }
-        workoutCursor.close();
-        Collections.reverse(options);
-        return options;
-    }
-
-    private void setListLabels(List<String> values) {
+    private void setListLabels() {
         final ListView listView = (ListView) findViewById(R.id.listview);
-        listView.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, values));
+        listView.setAdapter(new ArrayAdapter<>(getApplicationContext(), android.R.layout.simple_list_item_1, dbClient.getLastWorkouts(LAST_WORKOUTS)));
         listView.setOnItemClickListener(onItemClickListener);
     }
 
     private AdapterView.OnItemClickListener onItemClickListener = new AdapterView.OnItemClickListener() {
         @Override
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-            final String item = (String) parent.getItemAtPosition(position);
+            final WorkoutActivity item = (WorkoutActivity) parent.getItemAtPosition(position);
 
-            String[] sID = item.split(" ");
-            int workoutId = Integer.parseInt(sID[0]);
-
-            Log.d(TAG, "Let's go");
+            int workoutId = item.getId();
             new WorkoutSync(MainActivity.this, item).execute(workoutId);
         }
     };
 
+    private void openPlannedWorkoutsActivity() {
+        Intent intent = new Intent(MainActivity.this, PlannedWorkoutsActivity.class);
+        startActivity(intent);
+    }
 }

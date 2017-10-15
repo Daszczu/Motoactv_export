@@ -15,7 +15,7 @@ import org.jsoup.Jsoup;
 
 public class ConnectionManager {
 
-	public static Response post(String url, Map<String, String> data, Map<String, String> headers, Map<String, String> cookies, String referer, WorkoutToUpload wtu) {
+	public static Response post(String url, Map<String, String> data, Map<String, String> headers, Map<String, String> cookies, String referer, WorkoutToUpload wtu) throws IOException {
 		Connection conn = Jsoup.connect(url)
 							.userAgent("Mozilla/5.0 (Windows NT 10.0; WOW64; rv:43.0) Gecko/20100101 Firefox/43.0")
 							.ignoreHttpErrors(true)
@@ -51,17 +51,17 @@ public class ConnectionManager {
 			if (cookies != null)
 				cookies.putAll(res.cookies());
 		} catch (IOException e) {
-			e.printStackTrace();
+			throw e;
 		}
 		return res;
 	}
 
-	public static Response post(String url, Map<String, String> data, Map<String, String> headers, Map<String, String> cookies, String referer) {
+	public static Response post(String url, Map<String, String> data, Map<String, String> headers, Map<String, String> cookies, String referer) throws IOException {
 		return post(url, data, headers, cookies, referer, null);
 	}
 	
 
-	public static Response get(String url, Map<String, String> headers, Map<String, String> cookies, String referer) {
+	public static Response get(String url, Map<String, String> headers, Map<String, String> cookies, String referer) throws IOException {
 		Response res = post(url, null, headers, cookies, referer);
 		return res;
 	}

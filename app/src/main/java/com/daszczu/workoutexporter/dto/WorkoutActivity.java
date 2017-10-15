@@ -1,8 +1,15 @@
 package com.daszczu.workoutexporter.dto;
 
+import android.util.Log;
+
 import com.daszczu.workoutexporter.StringUtils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class WorkoutActivity {
     private int id;
@@ -19,6 +26,9 @@ public class WorkoutActivity {
     private double calories;
     private double duration;
     private List<Trackpoint> trackpoints;
+
+    private DateFormat df = new SimpleDateFormat("yyyy.MM.dd HH:mm", Locale.ENGLISH);
+    private DateFormat simpleDF = new SimpleDateFormat("HH:mm:ss", Locale.getDefault());
 
     public WorkoutActivity() {
     }
@@ -136,4 +146,23 @@ public class WorkoutActivity {
         this.duration = duration;
     }
 
+    @Override
+    public String toString() {
+        simpleDF.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String timeDuration = prepareTimeDuration(simpleDF.format(endTime - startTime));
+
+        return String.format(Locale.ENGLISH, "%s \n\r%.2fkm \t%s",
+                df.format(startTime),
+                distance/1000,
+                timeDuration);
+    }
+
+    private String prepareTimeDuration(String timeDuration) {
+        if (timeDuration.startsWith("0") || timeDuration.startsWith(":")) {
+            timeDuration = timeDuration.substring(1);
+            return prepareTimeDuration(timeDuration);
+        }
+        else
+            return timeDuration;
+    }
 }

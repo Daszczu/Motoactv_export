@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/tableLayout1"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent" >
+    <TableRow
+        android:id="@+id/tableRow1"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:padding="5dip" >
+
+        <ImageButton
+            android:layout_width="0dip"
+            android:layout_height="fill_parent"
+            android:layout_weight="1"
+            android:onClick="exportWorkout"
+            android:contentDescription="@string/export_workout_btn"
+            android:src="@drawable/strava" />
+
+        <ImageButton
+            android:layout_width="0dip"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:onClick="changePlannedRoute"
+            android:contentDescription="@string/change_planned_route_btn"
+            android:src="@drawable/ic_change_route" />
+    </TableRow>
+    <TableRow
+        android:id="@+id/tableRow2"
+        android:layout_weight="1"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:padding="5dip" >
+        <ImageButton
+            android:layout_width="0dip"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:onClick="addRouteFromFile"
+            android:contentDescription="@string/add_route_from_file_btn"
+            android:src="@drawable/ic_add_route_from_file"  />
+
+        <ImageButton
+            android:layout_width="0dip"
+            android:layout_height="fill_parent"
+            android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:onClick="planNewWorkout"
+            android:contentDescription="@string/plan_new_workout_btn"
+            android:src="@drawable/ic_add_workout"/>
+    </TableRow>
+</TableLayout>

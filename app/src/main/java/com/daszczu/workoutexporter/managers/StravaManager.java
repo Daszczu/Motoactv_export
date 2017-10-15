@@ -18,19 +18,19 @@ import java.util.Map;
 
 public class StravaManager {
 	private final static int APP_ID = 10733;
-	private final static String APP_SECRET = "APP_SECRET_HERE";
-	private final static String CLIENT_SECRET = "CLIENT_SECRET_HERE";
+	private final static String APP_SECRET = "4813c1e6da1db95ffb03bfe54ebafbd16b69a73d";
+	private final static String CLIENT_SECRET = "83aaf0063a057943d835e10e2604ea51e4842915";
 	private final static String FILE_TYPE = "tcx";
     private final static String AUTH_URL = "https://www.strava.com/oauth/token";
 	private Gson gson = new Gson();
     private String token;
 
-	public StravaManager() {
+	public StravaManager() throws IOException {
         StravaExchangeTokenResponse response = getToken();
         this.token = response.getAccessToken();
 	}
 
-	private StravaExchangeTokenResponse getToken() {
+	private StravaExchangeTokenResponse getToken() throws IOException {
         Map<String, String> data = new HashMap<>();
         data.put("client_id", String.valueOf(APP_ID));
         data.put("client_secret", APP_SECRET);

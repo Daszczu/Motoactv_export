@@ -7,18 +7,20 @@ import android.net.wifi.WifiManager;
 import android.os.Environment;
 
 import com.daszczu.workoutexporter.constants.Template;
+import com.daszczu.workoutexporter.dto.LapDetails;
 import com.daszczu.workoutexporter.dto.Trackpoint;
 import com.daszczu.workoutexporter.dto.WorkoutActivity;
 import com.daszczu.workoutexporter.managers.DatabaseManager;
-import com.daszczu.workoutexporter.managers.FileManager;
 
 import java.io.File;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
@@ -37,50 +39,55 @@ public class SyncTools {
         return dbClient.getFullWorkout(id);
     }
 
-    public File saveWorkoutToFile(WorkoutActivity woa) {
+    public File saveWorkoutToFile(WorkoutActivity woa, List<LapDetails> laps) {
         String sWorkoutDate = df.format(woa.getStartTime());
 
         File exportDir = new File(Environment.getExternalStorageDirectory(), "");
         String filename = String.format(Locale.getDefault(), "kd_workout_%s.%s", woa.getId(), "TCX");
-        File file = new File(exportDir, filename);
-
-        FileManager fm = new FileManager();
-
-        fm.append(Template.getBegining(),
-                StringUtils.prepareActivityType(woa.getTypeId(), 1),
-                StringUtils.prepareId(sWorkoutDate, 2),
-                StringUtils.prepareLapTime(sWorkoutDate),
-                StringUtils.prepareTotalTime(woa.getDuration() == 0.0 ? (woa.getEndTime() - woa.getStartTime()) / 1000D : woa.getDuration()),
-                StringUtils.prepareDistance(woa.getDistance()),
-                "<Intensity>Active</Intensity>",
-                "<TriggerMethod>Manual</TriggerMethod>",
-                "<Track>");
-
-        for (Trackpoint s : woa.getTrackpoints())
-            fm.append(
-                    "<Trackpoint>",
-                    StringUtils.prepareTime(df.format(new Date(s.getTime()))),
-                    StringUtils.preparePosition(s.getLat(), s.getLon()),
-                    StringUtils.prepareAltitude(s.getAltitude()),
-                    StringUtils.prepareDistance(s.getDistance()),
-                    StringUtils.prepareHeart(s.getHeartRate()),
-                    StringUtils.prepareSpeed(s.getSpeed()),
-                    StringUtils.prepareCadence(s.getCadence()),
-                    "</Trackpoint>");
-
-        fm.append(
-                "</Track>",
-                StringUtils.prepareMaxSpeed(woa.getMaxSpeed()),
-                StringUtils.prepareCalories(woa.getCalories()),
-                StringUtils.prepareAvgHeart(woa.getAvgHeartRate()),
-//                StringUtils.prepareMaxHeart(woa.getMaxHeartRate()),
-                StringUtils.prepareCadence(woa.getAvgCadence()),
-                "</Lap>",
-                "</Activity>",
-                "</Activities>",
-                "</TrainingCenterDatabase>");
+        File file = new File(exportDir, "/tcx/" + filename);
         try {
-            fm.save(new FileWriter(file));
+            FileOutputStream fos = new FileOutputStream(file);
+            OutputStreamWriter osw = new OutputStreamWriter(fos);
+
+            osw
+                .append(Template.getBegining())
+                .append(StringUtils.prepareActivityType(woa.getTypeId(), 1))
+                .append(StringUtils.prepareId(sWorkoutDate, 2));
+
+            osw
+                .append(StringUtils.prepareLapTime(sWorkoutDate))
+                .append(StringUtils.prepareTotalTime(woa.getDuration() == 0.0 ? (woa.getEndTime() - woa.getStartTime()) / 1000D : woa.getDuration()))
+                .append(StringUtils.prepareDistance(woa.getDistance()))
+                .append("<Intensity>Active</Intensity>")
+                .append("<TriggerMethod>Manual</TriggerMethod>")
+                .append("<Track>");
+
+            for (Trackpoint s : woa.getTrackpoints())
+                osw
+                    .append("<Trackpoint>")
+                    .append(StringUtils.prepareTime(df.format(new Date(s.getTime()))))
+                    .append(StringUtils.preparePosition(s.getLat(), s.getLon()))
+                    .append(StringUtils.prepareAltitude(s.getAltitude()))
+                    .append(StringUtils.prepareDistance(s.getDistance()))
+                    .append(StringUtils.prepareHeart(s.getHeartRate()))
+                    .append(StringUtils.prepareSpeed(s.getSpeed()))
+                    .append(StringUtils.prepareCadence(s.getCadence()))
+                    .append("</Trackpoint>");
+
+            osw
+                .append("</Track>")
+                .append(StringUtils.prepareMaxSpeed(woa.getMaxSpeed()))
+                .append(StringUtils.prepareCalories(woa.getCalories()))
+                .append(StringUtils.prepareAvgHeart(woa.getAvgHeartRate()))
+                .append(StringUtils.prepareCadence(woa.getAvgCadence()))
+                .append("</Lap>");
+
+            osw
+                .append("</Activity>")
+                .append("</Activities>")
+                .append("</TrainingCenterDatabase>");
+            osw.flush();
+            osw.close();
         }
         catch (IOException e) {
             e.printStackTrace();
@@ -91,7 +98,7 @@ public class SyncTools {
     public File fileExists(int id) {
         File exportDir = new File(Environment.getExternalStorageDirectory(), "");
         String filename = String.format(Locale.getDefault(), "kd_workout_%s.%s", id, "TCX");
-        File file = new File(exportDir, filename);
+        File file = new File(exportDir, "/tcx/" + filename);
         if (file.exists())
             return file;
         else
@@ -129,5 +136,9 @@ public class SyncTools {
         ConnectivityManager cm = (ConnectivityManager) ctx.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+    public List<LapDetails> getLaps(int workoutId) {
+        return dbClient.getLaps(workoutId);
     }
 }
