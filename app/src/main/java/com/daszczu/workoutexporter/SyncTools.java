@@ -5,6 +5,7 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.Environment;
+import android.util.Log;
 
 import com.daszczu.workoutexporter.constants.Template;
 import com.daszczu.workoutexporter.dto.LapDetails;
@@ -54,15 +55,30 @@ public class SyncTools {
                 .append(StringUtils.prepareActivityType(woa.getTypeId(), 1))
                 .append(StringUtils.prepareId(sWorkoutDate, 2));
 
-            osw
-                .append(StringUtils.prepareLapTime(sWorkoutDate))
-                .append(StringUtils.prepareTotalTime(woa.getDuration() == 0.0 ? (woa.getEndTime() - woa.getStartTime()) / 1000D : woa.getDuration()))
-                .append(StringUtils.prepareDistance(woa.getDistance()))
-                .append("<Intensity>Active</Intensity>")
-                .append("<TriggerMethod>Manual</TriggerMethod>")
-                .append("<Track>");
+            int lapNumber = 0;
+            LapDetails lapDetails = laps.get(lapNumber);
+            lapDetails.setTime(woa.getStartTime());
 
-            for (Trackpoint s : woa.getTrackpoints())
+            writeLapDetails(lapDetails, osw);
+            long lapTime = lapDetails.getTime();
+            long lapDuration = lapDetails.getDuration();
+
+            for (Trackpoint s : woa.getTrackpoints()) {
+                if (s.getTime() - lapTime > lapDuration) {
+                    lapNumber++;
+                    if (lapNumber != laps.size()) {
+                        lapDetails = laps.get(lapNumber);
+                        lapDuration = lapDetails.getDuration();
+
+                        lapTime = s.getTime();
+                        lapDetails.setTime(lapTime);
+
+                        osw
+                            .append("</Track>")
+                            .append("</Lap>");
+                        writeLapDetails(lapDetails, osw);
+                    }
+                }
                 osw
                     .append("<Trackpoint>")
                     .append(StringUtils.prepareTime(df.format(new Date(s.getTime()))))
@@ -73,13 +89,9 @@ public class SyncTools {
                     .append(StringUtils.prepareSpeed(s.getSpeed()))
                     .append(StringUtils.prepareCadence(s.getCadence()))
                     .append("</Trackpoint>");
-
+            }
             osw
                 .append("</Track>")
-                .append(StringUtils.prepareMaxSpeed(woa.getMaxSpeed()))
-                .append(StringUtils.prepareCalories(woa.getCalories()))
-                .append(StringUtils.prepareAvgHeart(woa.getAvgHeartRate()))
-                .append(StringUtils.prepareCadence(woa.getAvgCadence()))
                 .append("</Lap>");
 
             osw
@@ -93,6 +105,22 @@ public class SyncTools {
             e.printStackTrace();
         }
         return file;
+    }
+
+    private void writeLapDetails(LapDetails lapDetails, OutputStreamWriter osw) throws IOException {
+        osw
+            .append(StringUtils.prepareLapTime(df.format(lapDetails.getTime())))
+            .append(StringUtils.prepareTotalTime(lapDetails.getDuration() / 1000))
+            .append(StringUtils.prepareDistance(lapDetails.getDistance()))
+
+            .append(StringUtils.prepareMaxSpeed(lapDetails.getMaxSpeed()))
+            .append(StringUtils.prepareCalories(lapDetails.getCalories()))
+            .append(StringUtils.prepareAvgHeart(lapDetails.getAvgHeartRate()))
+            .append(StringUtils.prepareCadence(lapDetails.getCadence()))
+
+            .append("<Intensity>Active</Intensity>")
+            .append("<TriggerMethod>Manual</TriggerMethod>")
+            .append("<Track>");
     }
 
     public File fileExists(int id) {

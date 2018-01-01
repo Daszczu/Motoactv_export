@@ -500,7 +500,7 @@ public class DatabaseManager {
             LapDetails lap = new LapDetails();
             double lapSpeed = cursor.getDouble(cursor.getColumnIndex("speed"));
             double lapDistance = cursor.getDouble(cursor.getColumnIndex("distance"));
-            double lapDuration = cursor.getDouble(cursor.getColumnIndex("duration"));
+            long lapDuration = cursor.getLong(cursor.getColumnIndex("duration"));
             double lapCalorie = cursor.getDouble(cursor.getColumnIndex("calorie"));
             double lapHR = cursor.getDouble(cursor.getColumnIndex("heart_rate"));
             double lapCadence = cursor.getDouble(cursor.getColumnIndex("step_rate"));
@@ -513,6 +513,7 @@ public class DatabaseManager {
             lap.setCalories(lapCalorie);
             laps.add(lap);
         }
+        cursor.close();
         return laps;
     }
 }

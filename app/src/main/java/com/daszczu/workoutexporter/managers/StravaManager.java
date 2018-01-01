@@ -61,7 +61,7 @@ public class StravaManager {
             int statusCode = res2.statusCode();
             String body = res2.body();
 
-            if (statusCode != 200 && statusCode != 400)
+            if (statusCode != 200 && statusCode != 400 && statusCode != 201)
                 throw new ConnectionException(statusCode, res2.parse().text());
 
             Log.d("TAG", body);

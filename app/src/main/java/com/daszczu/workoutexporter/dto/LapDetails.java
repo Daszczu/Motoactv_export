@@ -2,7 +2,7 @@ package com.daszczu.workoutexporter.dto;
 
 public class LapDetails {
     private long time;
-    private double duration;
+    private long duration;
     private double distance;
     private double maxSpeed;
     private double calories;
@@ -17,11 +17,11 @@ public class LapDetails {
         this.time = time;
     }
 
-    public double getDuration() {
+    public long getDuration() {
         return duration;
     }
 
-    public void setDuration(double duration) {
+    public void setDuration(long duration) {
         this.duration = duration;
     }
 

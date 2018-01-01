@@ -63,6 +63,7 @@ public class WorkoutSync extends AsyncTask<Integer, String, StravaUploadResponse
             try {
                 sm = new StravaManager();
             } catch (IOException e) {
+                Log.e("WorkoutSync", e.getLocalizedMessage());
                 return new StravaUploadResponse("Strava failure", "Cannot obtain auth token");
             }
             return uploadActivity(sm, file, "95", "Sending workout");
@@ -89,7 +90,7 @@ public class WorkoutSync extends AsyncTask<Integer, String, StravaUploadResponse
         }
         catch (ConnectionException e) {
             String iteration = progressInfo.length != 2 ? String.valueOf(Integer.valueOf(progressInfo[2]) + 1) : "2";
-            Log.e("UPLOAD", e.getLocalizedMessage());
+            Log.e("UPLOAD",e.getStatusCode() + " " + e.getLocalizedMessage());
             return uploadActivity(sm, file, progressInfo[0], progressInfo[1], iteration);
         }
     }
