@@ -16,13 +16,31 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
+import com.crashlytics.android.Crashlytics;
+import com.daszczu.workoutexporter.async.SaveAllWorkouts;
 import com.daszczu.workoutexporter.async.WorkoutSync;
+import com.daszczu.workoutexporter.dto.LapDetails;
 import com.daszczu.workoutexporter.dto.WorkoutActivity;
 import com.daszczu.workoutexporter.managers.DatabaseManager;
+
+import org.apache.commons.io.FileUtils;
+
+import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipOutputStream;
+
+import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends Activity {
     private String TAG = "EXPORTER";
     private DatabaseManager dbClient;
+    private SyncTools syncTools;
     private final static int LAST_WORKOUTS = 5;
 
     @Override
@@ -36,6 +54,9 @@ public class MainActivity extends Activity {
         switch (item.getItemId()) {
             case R.id.open_plannedworkoutactivity:
                 openPlannedWorkoutsActivity();
+                return true;
+            case R.id.export_all:
+                exportAllActivities();
                 return true;
             default:
                 return super.onOptionsItemSelected(item);
@@ -52,7 +73,9 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Fabric.with(this, new Crashlytics());
         dbClient = new DatabaseManager(getContentResolver());
+        syncTools = new SyncTools(MainActivity.this, "backup");
 //        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
@@ -79,5 +102,21 @@ public class MainActivity extends Activity {
     private void openPlannedWorkoutsActivity() {
         Intent intent = new Intent(MainActivity.this, PlannedWorkoutsActivity.class);
         startActivity(intent);
+    }
+
+    private void exportAllActivities() {
+        //TODO implement exporting all activities - use ASYNC!!!
+        // 1. Get all the ids
+        // 2. Check if file workout exists
+        // 3. If not create, if exists use it
+        // 4. Create maps with names and sizes
+        // 5. Sort those file in zips of 2.5MBs
+        // 6. Profit $$$
+        Integer[] activityIds = dbClient.getAllWorkoutsIds();
+
+        //invoke the async task
+
+        SaveAllWorkouts saveAllWorkoutsTask = new SaveAllWorkouts(MainActivity.this);
+        saveAllWorkoutsTask.execute(activityIds);
     }
 }

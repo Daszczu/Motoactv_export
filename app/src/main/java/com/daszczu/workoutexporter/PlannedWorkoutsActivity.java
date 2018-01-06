@@ -16,6 +16,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.crashlytics.android.Crashlytics;
 import com.daszczu.workoutexporter.async.GPXInsert;
 import com.daszczu.workoutexporter.dto.Instance;
 import com.daszczu.workoutexporter.dto.Routine;
@@ -24,6 +25,8 @@ import com.daszczu.workoutexporter.managers.DatabaseManager;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+
+import io.fabric.sdk.android.Fabric;
 
 
 public class PlannedWorkoutsActivity extends Activity {
@@ -42,6 +45,7 @@ public class PlannedWorkoutsActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Fabric.with(this, new Crashlytics());
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         setContentView(R.layout.planned_workouts);

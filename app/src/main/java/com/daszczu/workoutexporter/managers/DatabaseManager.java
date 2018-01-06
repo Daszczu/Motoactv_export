@@ -166,6 +166,7 @@ public class DatabaseManager {
 //        woa.setMaxHeartRate(maxHeart);
         woa.setMaxSpeed(maxSpeed);
         woa.setTrackpoints(trackPoints);
+        cursor.close();
         return woa;
     }
 
@@ -190,6 +191,27 @@ public class DatabaseManager {
             workouts.add(workoutActivity);
         }
         return workouts;
+    }
+
+    public Integer[] getAllWorkoutsIds() {
+        Cursor cur = this.CR.query(
+                CONTENT_URI_WORKOUT_ACTIVITY,
+                new String[] {"workout_id"},
+                null,
+                null,
+                null);
+
+        if (cur == null || cur.getCount() == 0)
+            return null;
+
+        Integer[] ids = new Integer[cur.getCount()];
+
+        for (int i = 0; cur.moveToNext(); i++) {
+            ids[i] = getInt(cur, "workout_id");
+        }
+
+        cur.close();
+        return ids;
     }
 
     private long getLong(Cursor cur, String columnName) {

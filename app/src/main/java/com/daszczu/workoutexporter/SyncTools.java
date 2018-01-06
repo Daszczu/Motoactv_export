@@ -16,6 +16,7 @@ import com.daszczu.workoutexporter.managers.DatabaseManager;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -29,11 +30,17 @@ public class SyncTools {
     private Context ctx;
     private DatabaseManager dbClient;
     private DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS", Locale.getDefault());
+    private String tcxFolder = "tcx";
 
-    public SyncTools (Context ctx) {
+    public SyncTools(Context ctx) {
         this.ctx = ctx;
         this.df.setTimeZone(TimeZone.getTimeZone("UTC"));
         this.dbClient = new DatabaseManager(ctx.getContentResolver());
+    }
+
+    public SyncTools(Context ctx, String tcxFolder) {
+        this(ctx);
+        this.tcxFolder = tcxFolder;
     }
 
     public WorkoutActivity getWorkout(int id) {
@@ -43,11 +50,15 @@ public class SyncTools {
     public File saveWorkoutToFile(WorkoutActivity woa, List<LapDetails> laps) {
         String sWorkoutDate = df.format(woa.getStartTime());
 
-        File exportDir = new File(Environment.getExternalStorageDirectory(), "");
+        File exportDir = new File(Environment.getExternalStorageDirectory(), tcxFolder);
+        if (!exportDir.exists())
+            exportDir.mkdir();
+
         String filename = String.format(Locale.getDefault(), "kd_workout_%s.%s", woa.getId(), "TCX");
-        File file = new File(exportDir, "/tcx/" + filename);
+        File file = new File(exportDir, filename);
+
         try {
-            FileOutputStream fos = new FileOutputStream(file);
+            OutputStream fos = new FileOutputStream(file);
             OutputStreamWriter osw = new OutputStreamWriter(fos);
 
             osw
@@ -103,10 +114,14 @@ public class SyncTools {
         }
         catch (IOException e) {
             e.printStackTrace();
+            Log.e("saveWorkoutToFile", "Workout id: " + woa.getId());
         }
         return file;
     }
 
+    public void saveWorkoutToByteArrayOutputStream() {
+
+    }
     private void writeLapDetails(LapDetails lapDetails, OutputStreamWriter osw) throws IOException {
         osw
             .append(StringUtils.prepareLapTime(df.format(lapDetails.getTime())))
@@ -124,13 +139,11 @@ public class SyncTools {
     }
 
     public File fileExists(int id) {
-        File exportDir = new File(Environment.getExternalStorageDirectory(), "");
+        File exportDir = new File(Environment.getExternalStorageDirectory(), tcxFolder);
         String filename = String.format(Locale.getDefault(), "kd_workout_%s.%s", id, "TCX");
-        File file = new File(exportDir, "/tcx/" + filename);
-        if (file.exists())
-            return file;
-        else
-            return null;
+        File file = new File(exportDir, filename);
+
+        return file.exists() ? file : null;
     }
 
     public boolean checkOrEnableInternet() {

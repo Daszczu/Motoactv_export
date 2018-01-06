@@ -9,4 +9,5 @@
     <string name="add_route_from_file_btn">Add route from file</string>
     <string name="plan_new_workout_btn">Plan new workout</string>
     <string name="title_activity_main_menu">MainMenu</string>
+    <string name="export_all">Export all activities</string>
 </resources>
