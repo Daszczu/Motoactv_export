@@ -56,12 +56,14 @@ public class DatabaseManager {
 
     private WorkoutActivity getWorkoutBaseInfo(int id) {
         Cursor cursor;
+        int count;
+
         if (id == 0)
             cursor = this.CR.query(CONTENT_URI_WORKOUT_ACTIVITY, null, "", null, "_id desc");
         else
             cursor = this.CR.query(CONTENT_URI_WORKOUT_ACTIVITY, null, "_id = " + id, null, null);
 
-        if (cursor != null && cursor.getCount() > 0)
+        if (cursor != null && (count = cursor.getCount()) > 0)
             cursor.moveToNext();
         else
             return new WorkoutActivity();
@@ -71,6 +73,12 @@ public class DatabaseManager {
         long endTime = getLong(cursor, "end_time");
         int activityTypeId = getInt(cursor, "activity_type_id");
         String activityType = StringUtils.getActivityType(activityTypeId);
+
+        for (int i = 1; i < count; i++) {
+            cursor.moveToNext();
+            endTime = getLong(cursor, "end_time");
+        }
+
         cursor.close();
 
         WorkoutActivity woa = new WorkoutActivity(id, startTime, endTime, activityTypeId, activityType);
@@ -110,7 +118,8 @@ public class DatabaseManager {
         Cursor cursor = this.CR.query(CONTENT_URI_APGX, null, "time_of_day >= " + startTime + " and time_of_day <= " + endTime, null, null);
 
         if (cursor == null || cursor.getCount() == 0)
-            return null;
+            return null; //WORKOUT_ACTIVITY_APGX contains no values
+        //i suggest returning woa instead of null
 
         while (cursor.moveToNext()) {
             long id = getLong(cursor, "_id");

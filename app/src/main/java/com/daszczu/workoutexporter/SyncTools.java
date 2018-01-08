@@ -77,7 +77,7 @@ public class SyncTools {
             for (Trackpoint s : woa.getTrackpoints()) {
                 if (s.getTime() - lapTime > lapDuration) {
                     lapNumber++;
-                    if (lapNumber != laps.size()) {
+                    if (lapNumber < laps.size()) {
                         lapDetails = laps.get(lapNumber);
                         lapDuration = lapDetails.getDuration();
 
