@@ -43,7 +43,7 @@ public class SyncTools {
         this.tcxFolder = tcxFolder;
     }
 
-    public WorkoutActivity getWorkout(int id) {
+    public WorkoutActivity getWorkout(int id) throws NoActivityDataException {
         return dbClient.getFullWorkout(id);
     }
 

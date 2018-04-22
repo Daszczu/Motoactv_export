@@ -9,6 +9,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import com.daszczu.workoutexporter.ConnectionException;
+import com.daszczu.workoutexporter.NoActivityDataException;
 import com.daszczu.workoutexporter.R;
 import com.daszczu.workoutexporter.dto.LapDetails;
 import com.daszczu.workoutexporter.managers.StravaManager;
@@ -51,7 +52,12 @@ public class WorkoutSync extends AsyncTask<Integer, String, StravaUploadResponse
         int workoutId = params[0];
         File file = syncTools.fileExists(workoutId);
         if (file == null)
-            file = createWorkoutFile(workoutId);
+            try {
+                file = createWorkoutFile(workoutId);
+            } catch (NoActivityDataException e) {
+                Log.d("SaveAllWorkouts", "Missing data for workoutActivityId: " + e.getWorkoutActivityId());
+                return null;
+            }
 
         publishProgress("75", "Checking Internet connection");
 
@@ -72,7 +78,7 @@ public class WorkoutSync extends AsyncTask<Integer, String, StravaUploadResponse
             return new StravaUploadResponse("Internet failure", "Cannot connect to the Internet");
     }
 
-    private File createWorkoutFile(int workoutId) {
+    private File createWorkoutFile(int workoutId) throws NoActivityDataException {
         publishProgress("40", "Reading workout");
         WorkoutActivity woa = syncTools.getWorkout(workoutId);
         List<LapDetails> laps = syncTools.getLaps(workoutId);
@@ -114,10 +120,13 @@ public class WorkoutSync extends AsyncTask<Integer, String, StravaUploadResponse
         dialog.setContentView(R.layout.my_layout);
 
         TextView title = (TextView) dialog.findViewById(R.id.status);
-        title.setText(res.getStatus());
-
         TextView text = (TextView) dialog.findViewById(R.id.error);
-        text.setText(res.getError());
+
+        String sTitle = res != null ? res.getStatus() : "No activity data";
+        String sError = res != null ? res.getError() : "Data for this activity is corrupted. It cannot be exported";
+
+        title.setText(sTitle);
+        text.setText(sError);
 
         Button btn = (Button) dialog.findViewById(R.id.button);
         btn.setOnClickListener(new View.OnClickListener() {

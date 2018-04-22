@@ -7,6 +7,7 @@ import android.database.DatabaseUtils;
 import android.net.Uri;
 import android.util.Log;
 
+import com.daszczu.workoutexporter.NoActivityDataException;
 import com.daszczu.workoutexporter.StringUtils;
 import com.daszczu.workoutexporter.dto.GPX;
 import com.daszczu.workoutexporter.dto.Instance;
@@ -21,8 +22,10 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 import static com.daszczu.workoutexporter.constants.Metrics.*;
 
@@ -90,9 +93,9 @@ public class DatabaseManager {
         return woa;
     }
 
-    public double getMetric(int workoutId, int metricId) {
+    public double getMetric(int workoutActivityId, int metricId) {
         Cursor cursor = CR.query(CONTENT_URI_WORKOUT_ACTIVITY_SUMMARY, null,
-                "workout_activity_id = " + workoutId + " and metric_id = " + metricId, null, null);
+                "workout_activity_id = " + workoutActivityId + " and metric_id = " + metricId, null, null);
 
         if (cursor != null && cursor.getCount() > 0)
             cursor.moveToNext();
@@ -105,24 +108,23 @@ public class DatabaseManager {
         return dMetric;
     }
 
-    public WorkoutActivity getFullWorkout(int workoutId) {
+    public WorkoutActivity getFullWorkout(int workoutId) throws NoActivityDataException {
         WorkoutActivity woa = getWorkoutBaseInfo(workoutId);
         long startTime = woa.getStartTime();
         long endTime = woa.getEndTime();
 
-        Double avgHeart = 0D, maxHeart = 0D, maxSpeed = 0D, avgCadence = 0D;
-        int cadenceSize = 0, heartRateSize = 0;
+//        Double avgHeart = 0D, maxHeart = 0D, maxSpeed = 0D, avgCadence = 0D;
+//        int cadenceSize = 0, heartRateSize = 0;
         long stepsPrev = 0;
         long timePrev = 0;
         List<Trackpoint> trackPoints = new ArrayList<>();
         Cursor cursor = this.CR.query(CONTENT_URI_APGX, null, "time_of_day >= " + startTime + " and time_of_day <= " + endTime, null, null);
 
         if (cursor == null || cursor.getCount() == 0)
-            return null; //WORKOUT_ACTIVITY_APGX contains no values
-        //i suggest returning woa instead of null
+            throw new NoActivityDataException(workoutId);
 
         while (cursor.moveToNext()) {
-            long id = getLong(cursor, "_id");
+//            long id = getLong(cursor, "_id");
             long time = getLong(cursor, "time_of_day");
             double lat = getDouble(cursor, "latitude");
             double lon = getDouble(cursor, "longitude");
@@ -146,20 +148,20 @@ public class DatabaseManager {
             }
 
 //            maxHeart = maxHeart > heartRate ? maxHeart : heartRate;
-            maxSpeed = maxSpeed > speed ? maxSpeed : speed;
+//            maxSpeed = maxSpeed > speed ? maxSpeed : speed;
 
 
 //            if (heartRate != 0) {
 //                avgHeart += heartRate;
 //                heartRateSize++;
 //            }
-            if (cadence != 0) {
-                avgCadence += cadence;
-                cadenceSize++;
-            }
+//            if (cadence != 0) {
+//                avgCadence += cadence;
+//                cadenceSize++;
+//            }
 
             //set avgs and maxes and calories
-            Trackpoint tp = new Trackpoint(id, time, lon, lat, alt, distance, speed, heartRate, cadence);
+            Trackpoint tp = new Trackpoint(0, time, lon, lat, alt, distance, speed, heartRate, cadence);
             trackPoints.add(tp);
             if (woa.getTypeId() == 0)
                 woa.setTypeId(getInt(cursor, "activity_type"));
@@ -167,13 +169,13 @@ public class DatabaseManager {
 
 //        if (heartRateSize != 0)
 //            avgHeart /= heartRateSize;
-        if (cadenceSize != 0)
-            avgCadence /= cadenceSize;
+//        if (cadenceSize != 0)
+//            avgCadence /= cadenceSize;
 
-        woa.setAvgCadence(avgCadence);
+//        woa.setAvgCadence(avgCadence);
 //        woa.setAvgHeartRate(avgHeart);
 //        woa.setMaxHeartRate(maxHeart);
-        woa.setMaxSpeed(maxSpeed);
+//        woa.setMaxSpeed(maxSpeed);
         woa.setTrackpoints(trackPoints);
         cursor.close();
         return woa;
@@ -202,25 +204,24 @@ public class DatabaseManager {
         return workouts;
     }
 
-    public Integer[] getAllWorkoutsIds() {
+    public Integer[] getAllWorkoutActivitiesIds() {
         Cursor cur = this.CR.query(
-                CONTENT_URI_WORKOUT_ACTIVITY,
-                new String[] {"workout_id"},
+                CONTENT_URI_WORKOUT_ACTIVITY_SUMMARY_VIEW,
+                new String[] {"workout_activity_id"},
                 null,
                 null,
                 null);
 
         if (cur == null || cur.getCount() == 0)
             return null;
+        Set<Integer> set = new HashSet<>();
 
-        Integer[] ids = new Integer[cur.getCount()];
-
-        for (int i = 0; cur.moveToNext(); i++) {
-            ids[i] = getInt(cur, "workout_id");
+        while(cur.moveToNext()) {
+            set.add(getInt(cur, "workout_activity_id"));
         }
 
         cur.close();
-        return ids;
+        return set.toArray(new Integer[0]);
     }
 
     private long getLong(Cursor cur, String columnName) {
