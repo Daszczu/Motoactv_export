@@ -10,4 +10,17 @@
     <string name="plan_new_workout_btn">Plan new workout</string>
     <string name="title_activity_main_menu">MainMenu</string>
     <string name="export_all">Export all activities</string>
+    <string name="moto_url">https://motoactv.com/</string>
+
+    <string name="new_workout_start_date">Start date</string>
+    <string name="new_workout_end_date">End date</string>
+    <string name="new_workout_start_time">Start time</string>
+    <string name="new_workout_send_button">Send</string>
+
+    <string name="title_activity_new_workout_planner">NewWorkoutPlannerActivity</string>
+    <string name="activity_types_spinner">Activity type</string>
+    <string-array name="activity_types">
+        <item>Running</item>
+        <item>Riding</item>
+    </string-array>
 </resources>

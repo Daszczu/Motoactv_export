@@ -21,10 +21,12 @@ import com.crashlytics.android.Crashlytics;
 import com.daszczu.workoutexporter.async.GPXInsert;
 import com.daszczu.workoutexporter.dto.Instance;
 import com.daszczu.workoutexporter.dto.Routine;
+import com.daszczu.workoutexporter.retrofit.RetrofitCalls;
 
 import io.fabric.sdk.android.Fabric;
 import java.io.File;
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -58,10 +60,9 @@ public class MainMenu extends Activity {
         startActivity(intent);
     }
 
-    public void addRouteFromFile(View v) {
-        registerForContextMenu(v);
-        openContextMenu(v);
-
+    public void addRouteFromFile(View v) throws ParseException, IOException {
+        Intent intent = new Intent(this, NewWorkoutPlannerActivity.class);
+        startActivity(intent);
     }
 
     public void planNewWorkout(View v) {

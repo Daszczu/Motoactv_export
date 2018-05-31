@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="fill_parent"
+                android:layout_height="match_parent"
+                android:gravity="center">
+
+                <Button
+                    android:id="@+id/start_date_picker"
+                    style="@style/Button"
+                    android:layout_alignParentLeft="true"
+                    android:layout_alignParentStart="true"
+                    android:layout_alignParentTop="true"
+                    android:text="@string/new_workout_start_date" />
+
+                <Button
+                    android:id="@+id/time_picker"
+                    style="@style/Button"
+                    android:layout_toEndOf="@+id/start_date_picker"
+                    android:layout_toRightOf="@+id/start_date_picker"
+                    android:layout="@+id/time_picker"
+                    android:text="@string/new_workout_start_time" />
+            </RelativeLayout>
+
+            <EditText
+                android:id="@+id/title_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textAutoCorrect"
+                android:text="Title" />
+
+            <EditText
+                android:id="@+id/desc_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="textAutoCorrect"
+                android:text="Description" />
+
+            <Spinner
+                android:id="@+id/activityTypesSpinner"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:prompt="@string/activity_types_spinner" />
+        </LinearLayout>
+    </ScrollView>
+
+    <Button
+        android:id="@+id/sendBtn"
+        style="@style/Button"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:onClick="send"
+        android:text="@string/new_workout_send_button"
+        android:textColor="#FFF" />
+
+
+</RelativeLayout>

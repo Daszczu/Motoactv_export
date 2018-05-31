@@ -15,9 +15,9 @@
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
-        <activity
-            android:name=".MainActivity">
+        android:theme="@style/AppTheme"
+        android:name=".App">
+        <activity android:name=".MainActivity">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.daszczu.workoutexporter.MainMenu" />
@@ -29,16 +29,25 @@
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value="com.daszczu.workoutexporter.MainMenu" />
         </activity>
-        <activity
-            android:name=".MainMenu">
+        <activity android:name=".MainMenu">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
         <meta-data
             android:name="io.fabric.ApiKey"
             android:value="99a2b0868226f80f4e47afaff1ed47a4af3aa0fe" />
+
+        <activity
+            android:name=".NewWorkoutPlannerActivity"
+            android:label="@string/title_activity_new_workout_planner">
+            <meta-data
+                    android:name="android.support.PARENT_ACTIVITY"
+                    android:value="com.daszczu.workoutexporter.MainMenu" />
+        </activity>
     </application>
 
 </manifest>

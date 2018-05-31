@@ -43,6 +43,7 @@ public class MapsImporter {
     int event = xpp.getEventType();
 
     boolean insideTag = false;
+    boolean elevationTag = false;
     while (event != XmlPullParser.END_DOCUMENT) {
       switch (event) {
         case XmlPullParser.START_TAG:
@@ -52,10 +53,13 @@ public class MapsImporter {
             track.setLat(Double.valueOf(xpp.getAttributeValue(0)));
             track.setLon(Double.valueOf(xpp.getAttributeValue(1)));
           }
+          if ("ele".equals(xpp.getName())) {
+            elevationTag = true;
+          }
           break;
 
         case XmlPullParser.TEXT:
-          if (insideTag) {
+          if (insideTag && elevationTag) {
             String content = xpp.getText();
             if (content != null) {
               content = content.replace("\n", "").replace(" ", "");
@@ -70,6 +74,9 @@ public class MapsImporter {
               insideTag = false;
               tracks.add(track);
               break;
+          }
+          if ("ele".equals(xpp.getName())) {
+            elevationTag = false;
           }
           break;
       }
