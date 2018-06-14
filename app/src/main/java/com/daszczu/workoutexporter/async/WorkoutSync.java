@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.crashlytics.android.Crashlytics;
 import com.daszczu.workoutexporter.ConnectionException;
 import com.daszczu.workoutexporter.NoActivityDataException;
 import com.daszczu.workoutexporter.R;
@@ -96,7 +97,10 @@ public class WorkoutSync extends AsyncTask<Integer, String, StravaUploadResponse
         }
         catch (ConnectionException e) {
             String iteration = progressInfo.length != 2 ? String.valueOf(Integer.valueOf(progressInfo[2]) + 1) : "2";
-            Log.e("UPLOAD",e.getStatusCode() + " " + e.getLocalizedMessage());
+            String errorMsg = iteration + " " + e.getStatusCode() + " " + e.getLocalizedMessage();
+            Log.e("UPLOAD", errorMsg);
+            Crashlytics.setString("UPLOAD", errorMsg);
+            Crashlytics.logException(e);
             return uploadActivity(sm, file, progressInfo[0], progressInfo[1], iteration);
         }
     }
