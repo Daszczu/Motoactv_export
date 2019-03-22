@@ -1,34 +1,21 @@
 package com.daszczu.workoutexporter;
 
-import android.content.Context;
-import android.content.Intent;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
-import android.net.wifi.WifiManager;
-import android.os.Bundle;
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Bundle;
 import android.os.Environment;
 import android.view.ContextMenu;
-import android.view.Menu;
 import android.view.MenuItem;
-import android.view.SubMenu;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Toast;
-
 import com.crashlytics.android.Crashlytics;
-import com.daszczu.workoutexporter.async.GPXInsert;
-import com.daszczu.workoutexporter.dto.Instance;
-import com.daszczu.workoutexporter.dto.Routine;
-import com.daszczu.workoutexporter.retrofit.RetrofitCalls;
-
 import io.fabric.sdk.android.Fabric;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.ParseException;
-import java.util.Calendar;
-import java.util.Date;
 
 public class MainMenu extends Activity {
     private File[] gpxFiles;

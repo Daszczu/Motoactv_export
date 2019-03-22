@@ -1,16 +1,11 @@
 package com.daszczu.workoutexporter.managers;
 
-import android.content.res.Resources;
-import android.util.Log;
-
 import com.daszczu.workoutexporter.App;
-import com.daszczu.workoutexporter.ConnectionException;
 import com.daszczu.workoutexporter.R;
 import com.daszczu.workoutexporter.dto.StravaExchangeTokenResponse;
 import com.daszczu.workoutexporter.dto.StravaUploadResponse;
 import com.daszczu.workoutexporter.dto.WorkoutToUpload;
 import com.google.gson.Gson;
-
 import org.jsoup.Connection;
 
 import java.io.File;
@@ -20,59 +15,39 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StravaManager {
-	private static final int APP_ID = 10733;
-	private String appSecret;
-	private String clientSecret;
-	private static final String FILE_TYPE = "tcx";
-	private static final String AUTH_URL = "https://www.strava.com/oauth/token";
-	private Gson gson = new Gson();
-  private String token;
+    private static final String LOGIN_URL = "https://strava-proxy.herokuapp.com/strava/login?client_secret=%s&code=%s;";
+    private static final String UPLOAD_URL = "https://strava-proxy.herokuapp.com/strava/upload?activity_type=%s";
+    private static final String FILE_TYPE = "tcx";
+    private Gson gson = new Gson();
+    private String appSecret;
+    private String clientSecret;
+    private ConnectionManager connectionManager;
 
-	public StravaManager() throws IOException {
+    public StravaManager() {
         appSecret = App.getContext().getString(R.string.strava_app_secret);
         clientSecret = App.getContext().getString(R.string.strava_client_secret);
+        connectionManager = new ConnectionManager();
+    }
 
-        StravaExchangeTokenResponse response = getToken();
-        this.token = response.getAccessToken();
-	}
-
-	private StravaExchangeTokenResponse getToken() throws IOException {
-        Map<String, String> data = new HashMap<>();
-        data.put("client_id", String.valueOf(APP_ID));
-        data.put("client_secret", appSecret);
-        data.put("code", clientSecret);
-
-        Connection.Response res = ConnectionManager.post(AUTH_URL, data, null, new HashMap<String, String>(), null);
+    public StravaExchangeTokenResponse getToken() throws IOException {
+        Connection.Response res = connectionManager.get(
+                String.format(LOGIN_URL, appSecret, clientSecret),
+                null,
+                null,
+                null);
 
         return gson.fromJson(res.body(), StravaExchangeTokenResponse.class);
     }
 
-	public StravaUploadResponse uploadActivity2(File file) throws ConnectionException {
-        try {
-            Map<String, String> headers = new HashMap<>();
-            Map<String, String> data = new HashMap<>();
-            WorkoutToUpload wtu = new WorkoutToUpload(file.getName(), new FileInputStream(file));
+    public StravaUploadResponse uploadActivity(File file, String token) throws IOException {
+        Map<String, String> headers = new HashMap<>();
+        Map<String, String> data = new HashMap<>();
+        WorkoutToUpload wtu = new WorkoutToUpload(file.getName(), new FileInputStream(file));
 
-            String uploadURL = "https://www.strava.com/api/v3/uploads";
-            headers.put("Authorization", "Bearer " + token);
-            data.put("data_type", FILE_TYPE);
+        headers.put("Token", token);
+        data.put("data_type", FILE_TYPE);
 
-            Connection.Response res2 = ConnectionManager.post(uploadURL, data, headers, null, null, wtu);
-            if (res2 == null) {
-                Log.d("UploadActivity", token);
-                throw new ConnectionException(0, "Response is null");
-            }
-
-            int statusCode = res2.statusCode();
-            String body = res2.body();
-
-            if (statusCode != 200 && statusCode != 400 && statusCode != 201)
-                throw new ConnectionException(statusCode, res2.parse().text());
-
-            Log.d("TAG", body);
-            return gson.fromJson(body, StravaUploadResponse.class);
-        } catch (IOException e) {
-            throw new ConnectionException(0, e.getLocalizedMessage());
-        }
-	}
+        Connection.Response response = connectionManager.post(UPLOAD_URL, data, headers, null, null, wtu);
+        return gson.fromJson(response.body(), StravaUploadResponse.class);
+    }
 }

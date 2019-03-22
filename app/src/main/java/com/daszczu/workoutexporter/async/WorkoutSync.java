@@ -7,23 +7,18 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-
-import com.crashlytics.android.Crashlytics;
-import com.daszczu.workoutexporter.ConnectionException;
 import com.daszczu.workoutexporter.NoActivityDataException;
 import com.daszczu.workoutexporter.R;
-import com.daszczu.workoutexporter.dto.LapDetails;
-import com.daszczu.workoutexporter.managers.StravaManager;
 import com.daszczu.workoutexporter.SyncTools;
+import com.daszczu.workoutexporter.dto.LapDetails;
+import com.daszczu.workoutexporter.dto.StravaExchangeTokenResponse;
 import com.daszczu.workoutexporter.dto.StravaUploadResponse;
 import com.daszczu.workoutexporter.dto.WorkoutActivity;
+import com.daszczu.workoutexporter.managers.StravaManager;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Locale;
 
 public class WorkoutSync extends AsyncTask<Integer, String, StravaUploadResponse> {
     private ProgressDialog dialog;
@@ -66,17 +61,17 @@ public class WorkoutSync extends AsyncTask<Integer, String, StravaUploadResponse
 
         if (isOnline) {
             publishProgress("85", "Getting auth token");
-            StravaManager sm;
+            StravaManager stravaManager = new StravaManager();
+            StravaExchangeTokenResponse token;
             try {
-                sm = new StravaManager();
+                token = stravaManager.getToken();
+                publishProgress("95", "Sending workout");
+                return stravaManager.uploadActivity(file, token.getAccessToken());
             } catch (IOException e) {
-                Log.e("WorkoutSync", e.getLocalizedMessage());
-                return new StravaUploadResponse("Strava failure", "Cannot obtain auth token");
+                Log.e("WorkoutSync", e.getLocalizedMessage(), e);
             }
-            return uploadActivity(sm, file, "95", "Sending workout");
         }
-        else
-            return new StravaUploadResponse("Internet failure", "Cannot connect to the Internet");
+        return new StravaUploadResponse("Internet failure", "Cannot connect to the Internet");
     }
 
     private File createWorkoutFile(int workoutId) throws NoActivityDataException {
@@ -87,24 +82,6 @@ public class WorkoutSync extends AsyncTask<Integer, String, StravaUploadResponse
         return syncTools.saveWorkoutToFile(woa, laps);
     }
 
-    private StravaUploadResponse uploadActivity(StravaManager sm, File file, String... progressInfo) {
-        try {
-            if (progressInfo.length == 2)
-                publishProgress(progressInfo[0], progressInfo[1]);
-            else
-                publishProgress(progressInfo[0] + " " + progressInfo[2], progressInfo[1]);
-            return sm.uploadActivity2(file);
-        }
-        catch (ConnectionException e) {
-            String iteration = progressInfo.length != 2 ? String.valueOf(Integer.valueOf(progressInfo[2]) + 1) : "2";
-            String errorMsg = iteration + " " + e.getStatusCode() + " " + e.getLocalizedMessage();
-            Log.e("UPLOAD", errorMsg);
-            Crashlytics.setString("UPLOAD", errorMsg);
-            Crashlytics.logException(e);
-            return uploadActivity(sm, file, progressInfo[0], progressInfo[1], iteration);
-        }
-    }
-
     @Override
     protected void onProgressUpdate(String... values) {
         dialog.setMessage(String.format("%s%% - %s...", values[0], values[1]));
@@ -112,7 +89,7 @@ public class WorkoutSync extends AsyncTask<Integer, String, StravaUploadResponse
         try {
             Thread.sleep(300);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Log.e("WorkoutSync", e.getLocalizedMessage(), e);
         }
     }
 
