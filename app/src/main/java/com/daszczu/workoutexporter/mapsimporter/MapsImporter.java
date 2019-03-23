@@ -21,17 +21,11 @@ import org.xmlpull.v1.XmlPullParserException;
 import org.xmlpull.v1.XmlPullParserFactory;
 
 public class MapsImporter {
-  
-  public static void main(String[] args) throws SAXException, ParserConfigurationException, IOException, XmlPullParserException {
-    File file = new File(Environment.getExternalStorageDirectory(), "m81.gpx");
-    List<MapTrackPoint> tracks = getMapTracks(file);
 
-    for (MapTrackPoint track2 : tracks) {
-      System.out.println(String.format("%s lat, %s lon, %s alt", track2.getLat(), track2.getLon(), track2.getAlt()));
-    }
+  private MapsImporter() {
   }
-  
-  public static List<MapTrackPoint> getMapTracks(File file) throws SAXException, ParserConfigurationException, IOException, XmlPullParserException {
+
+  public static List<MapTrackPoint> getMapTracks(File file) throws IOException, XmlPullParserException {
     XmlPullParserFactory  factory = XmlPullParserFactory.newInstance();
     factory.setNamespaceAware(true);
     XmlPullParser xpp = factory.newPullParser();

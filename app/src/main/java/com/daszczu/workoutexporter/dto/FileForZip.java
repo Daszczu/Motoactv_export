@@ -7,7 +7,7 @@ public class FileForZip {
     private Long size;
 
     public FileForZip() {
-        this.filenames = new ArrayList<String>();
+        this.filenames = new ArrayList<>();
         this.size = 0L;
     }
 

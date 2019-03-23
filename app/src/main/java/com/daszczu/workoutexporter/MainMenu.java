@@ -59,21 +59,16 @@ public class MainMenu extends Activity {
 
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v, final ContextMenu.ContextMenuInfo menuInfo) {
-        int id = v.getId();
-        int btnId = R.id.image4;
         if (v.getId() == R.id.image4) {
             for (int i = 0; i < gpxFiles.length; i++) {
                 File file = gpxFiles[i];
                 menu.add(0, i, 0, file.getName());
             }
-
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
         }
     }
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        AdapterView.AdapterContextMenuInfo lastMenuInfo = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
         int itemId = item.getItemId();
         int groupId = item.getGroupId();
         return true;

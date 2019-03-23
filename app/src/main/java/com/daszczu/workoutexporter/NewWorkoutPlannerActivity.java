@@ -6,13 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.view.WindowManager;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.Spinner;
-import android.widget.Toast;
-
+import android.widget.*;
 import com.avast.android.dialogs.fragment.DatePickerDialogFragment;
 import com.avast.android.dialogs.fragment.TimePickerDialogFragment;
 import com.avast.android.dialogs.iface.IDateDialogListener;
@@ -25,13 +19,7 @@ import java.io.IOException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+import java.util.*;
 
 public class NewWorkoutPlannerActivity extends AppCompatActivity implements IDateDialogListener {
     private static final int REQUEST_START_DATE_PICKER = 11;

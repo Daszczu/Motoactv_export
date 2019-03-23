@@ -23,10 +23,9 @@ import com.daszczu.workoutexporter.managers.DatabaseManager;
 import io.fabric.sdk.android.Fabric;
 
 public class MainActivity extends Activity {
-    private String TAG = "EXPORTER";
+    private String tag = "EXPORTER";
     private DatabaseManager dbClient;
-    private SyncTools syncTools;
-    private final static int LAST_WORKOUTS = 5;
+    private static final int LAST_WORKOUTS = 5;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -53,15 +52,13 @@ public class MainActivity extends Activity {
         super.onStop();
         WifiManager wifiManager = (WifiManager)getApplicationContext().getSystemService(Context.WIFI_SERVICE);
         wifiManager.setWifiEnabled(false);
-        Log.d(TAG, "WiFi disabled");
+        Log.d(tag, "WiFi disabled");
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         Fabric.with(this, new Crashlytics());
         dbClient = new DatabaseManager(getContentResolver());
-        syncTools = new SyncTools(MainActivity.this, "backup");
-//        this.requestWindowFeature(Window.FEATURE_NO_TITLE);
         this.getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         super.onCreate(savedInstanceState);
         this.setContentView(R.layout.activity_main2);

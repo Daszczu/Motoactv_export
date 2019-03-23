@@ -113,19 +113,15 @@ public class SyncTools {
             osw.close();
         }
         catch (IOException e) {
-            e.printStackTrace();
             Log.e("saveWorkoutToFile", "Workout id: " + woa.getId());
         }
         return file;
     }
 
-    public void saveWorkoutToByteArrayOutputStream() {
-
-    }
     private void writeLapDetails(LapDetails lapDetails, OutputStreamWriter osw) throws IOException {
         osw
             .append(StringUtils.prepareLapTime(df.format(lapDetails.getTime())))
-            .append(StringUtils.prepareTotalTime(lapDetails.getDuration() / 1000))
+            .append(StringUtils.prepareTotalTime(lapDetails.getDuration() / 1000D))
             .append(StringUtils.prepareDistance(lapDetails.getDistance()))
 
             .append(StringUtils.prepareMaxSpeed(lapDetails.getMaxSpeed()))

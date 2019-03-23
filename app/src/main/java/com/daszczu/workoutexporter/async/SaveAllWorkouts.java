@@ -33,6 +33,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 public class SaveAllWorkouts extends AsyncTask<Integer, String, Void> {
+    private static final String BACKUP_FOLDER = "backup";
     private SyncTools syncTools;
     private ProgressDialog dialog;
 
@@ -40,7 +41,7 @@ public class SaveAllWorkouts extends AsyncTask<Integer, String, Void> {
     }
 
     public SaveAllWorkouts(Context ctx) {
-        this.syncTools = new SyncTools(ctx, "backup");
+        this.syncTools = new SyncTools(ctx, BACKUP_FOLDER);
         this.dialog = new ProgressDialog(ctx);
     }
 
@@ -80,9 +81,8 @@ public class SaveAllWorkouts extends AsyncTask<Integer, String, Void> {
                 dialog.dismiss();
             Map<String, Long> files = saveToZip();
             saveZipsToPackages(files);
-
         } catch (Exception e) {
-            e.printStackTrace();
+            Log.e("SaveAllWorkouts", e.getLocalizedMessage(), e);
         }
         super.onPostExecute(aVoid);
     }
@@ -116,7 +116,6 @@ public class SaveAllWorkouts extends AsyncTask<Integer, String, Void> {
 
         packages.add(zipFile);
         Asd asd = new Asd();
-        asd.size = 0;
         int index = 0;
         for (FileForZip zipFile1 : packages) {
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -125,7 +124,7 @@ public class SaveAllWorkouts extends AsyncTask<Integer, String, Void> {
             out.setLevel(9);
 
             for (String filename : zipFile1.getFilenames()) {
-                File exportDir = new File(Environment.getExternalStorageDirectory(), "backup");
+                File exportDir = new File(Environment.getExternalStorageDirectory(), BACKUP_FOLDER);
                 File file = new File(exportDir, filename);
 
                 ZipEntry ze = new ZipEntry(filename);
@@ -143,7 +142,7 @@ public class SaveAllWorkouts extends AsyncTask<Integer, String, Void> {
             byteArrayOutputStream.close();
             //int size = byteArrayOutputStream.toByteArray().length;
 
-            File exportDir = new File(Environment.getExternalStorageDirectory(), "backup");
+            File exportDir = new File(Environment.getExternalStorageDirectory(), BACKUP_FOLDER);
             String name = "moto" + index + ".zip";
             File file = new File(exportDir, name);
             OutputStream fos2 = null;
@@ -155,7 +154,7 @@ public class SaveAllWorkouts extends AsyncTask<Integer, String, Void> {
                 fos2.close();
             }
             index++;
-            asd.size = index;
+            asd.setSize(index);
 
         }
     }

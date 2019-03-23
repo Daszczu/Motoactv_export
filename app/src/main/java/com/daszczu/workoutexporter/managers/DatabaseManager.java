@@ -9,7 +9,6 @@ import android.util.Log;
 
 import com.daszczu.workoutexporter.NoActivityDataException;
 import com.daszczu.workoutexporter.StringUtils;
-import com.daszczu.workoutexporter.dto.GPX;
 import com.daszczu.workoutexporter.dto.Instance;
 import com.daszczu.workoutexporter.dto.LapDetails;
 import com.daszczu.workoutexporter.dto.Routine;
@@ -421,8 +420,9 @@ public class DatabaseManager {
                 null,
                 "begin DESC limit 5");
 
-        if (cursor == null || cursor.getCount() == 0)
-            return null;
+        if (cursor == null || cursor.getCount() == 0) {
+            return new ArrayList<>();
+        }
 
         List<Instance> instances = new ArrayList<>();
         while (cursor.moveToNext()) {

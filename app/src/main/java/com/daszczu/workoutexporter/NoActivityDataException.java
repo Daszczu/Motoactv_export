@@ -2,16 +2,12 @@ package com.daszczu.workoutexporter;
 
 public class NoActivityDataException extends Exception {
 
-    public NoActivityDataException() {
-        super();
-    }
+    private final int workoutActivityId;
 
     public NoActivityDataException(int workoutActivityId) {
         super();
         this.workoutActivityId = workoutActivityId;
     }
-
-    private int workoutActivityId;
 
     public int getWorkoutActivityId() {
         return workoutActivityId;

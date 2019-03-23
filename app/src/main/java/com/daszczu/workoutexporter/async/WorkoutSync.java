@@ -95,8 +95,9 @@ public class WorkoutSync extends AsyncTask<Integer, String, StravaUploadResponse
 
     @Override
     protected void onPostExecute(StravaUploadResponse res) {
-        if (dialog.isShowing())
+        if (dialog.isShowing()) {
             dialog.dismiss();
+        }
 
         dialog.setContentView(R.layout.my_layout);
 

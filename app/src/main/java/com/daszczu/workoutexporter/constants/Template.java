@@ -1,7 +1,11 @@
 package com.daszczu.workoutexporter.constants;
 
 public class Template {
-	private final static String NEW_LINE = "\r\n";
+
+	private Template(){
+	}
+
+	private static final String NEW_LINE = "\r\n";
 	
 	public static String getBegining() {
 		StringBuilder sb = new StringBuilder();

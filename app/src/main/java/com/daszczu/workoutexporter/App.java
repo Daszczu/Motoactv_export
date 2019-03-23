@@ -11,7 +11,7 @@ public class App extends Application {
   @Override
   public void onCreate() {
     super.onCreate();
-    mContext =  new WeakReference<Context>(this);
+    mContext = new WeakReference<Context>(this);
   }
 
   public static Context getContext() {

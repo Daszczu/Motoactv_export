@@ -14,7 +14,8 @@ import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
 public class APIClient {
-    private static Retrofit retrofit;
+    private APIClient() {
+    }
 
     public static Retrofit getClient(Context ctx) {
 
@@ -23,7 +24,7 @@ public class APIClient {
 
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(interceptor)
-                .connectTimeout(Integer.MAX_VALUE - 1, TimeUnit.MILLISECONDS)
+                .connectTimeout(Integer.MAX_VALUE - 1L, TimeUnit.MILLISECONDS)
                 .readTimeout(90, TimeUnit.SECONDS)
                 .writeTimeout(90, TimeUnit.SECONDS)
                 .followRedirects(false)
@@ -33,11 +34,10 @@ public class APIClient {
                 .setLenient()
                 .create();
 
-        retrofit = new Retrofit.Builder()
+        return new Retrofit.Builder()
                 .baseUrl(ctx.getString(R.string.moto_url))
                 .addConverterFactory(GsonConverterFactory.create(gson))
                 .client(client)
                 .build();
-        return retrofit;
     }
 }

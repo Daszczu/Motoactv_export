@@ -1,12 +1,9 @@
 package com.daszczu.workoutexporter.dto;
 
-import android.util.Log;
-
 import com.daszczu.workoutexporter.StringUtils;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -21,7 +18,6 @@ public class WorkoutActivity {
     private double avgCadence;
     private double avgHeartRate;
     private double maxHeartRate;
-//    private double avgSpeed;
     private double maxSpeed;
     private double calories;
     private double duration;
@@ -151,7 +147,7 @@ public class WorkoutActivity {
         simpleDF.setTimeZone(TimeZone.getTimeZone("GMT"));
         String timeDuration = prepareTimeDuration(simpleDF.format(endTime - startTime));
 
-        return String.format(Locale.ENGLISH, "%s \n\r%.2fkm \t%s",
+        return String.format(Locale.ENGLISH, "%s %n\r%.2fkm \t%s",
                 df.format(startTime),
                 distance/1000,
                 timeDuration);
@@ -161,8 +157,8 @@ public class WorkoutActivity {
         if (timeDuration.startsWith("0") || timeDuration.startsWith(":")) {
             timeDuration = timeDuration.substring(1);
             return prepareTimeDuration(timeDuration);
-        }
-        else
+        } else {
             return timeDuration;
+        }
     }
 }

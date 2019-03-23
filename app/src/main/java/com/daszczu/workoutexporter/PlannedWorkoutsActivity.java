@@ -1,39 +1,28 @@
 package com.daszczu.workoutexporter;
 
 import android.app.Activity;
-import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.os.Environment;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.SubMenu;
-import android.view.View;
-import android.view.WindowManager;
+import android.view.*;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import com.crashlytics.android.Crashlytics;
 import com.daszczu.workoutexporter.async.GPXInsert;
 import com.daszczu.workoutexporter.dto.Instance;
 import com.daszczu.workoutexporter.dto.Routine;
 import com.daszczu.workoutexporter.managers.DatabaseManager;
+import io.fabric.sdk.android.Fabric;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
-import io.fabric.sdk.android.Fabric;
-
-
 public class PlannedWorkoutsActivity extends Activity {
     private DatabaseManager dbClient;
-    private ListView lv;
     private List<Instance> instances;
-    private ProgressDialog dialog;
     private File[] gpxFiles;
     private List<Routine> routines;
     private AdapterView.AdapterContextMenuInfo lastMenuInfo;
@@ -67,7 +56,7 @@ public class PlannedWorkoutsActivity extends Activity {
 
     private void populateListView() {
         instances = dbClient.getInstances();
-        lv = (ListView) findViewById(R.id.planned_list_view);
+        ListView lv = (ListView) findViewById(R.id.planned_list_view);
         arrayAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, instances);
         lv.setAdapter(arrayAdapter);
         lv.setOnItemClickListener(onItemClickListener);
@@ -80,16 +69,13 @@ public class PlannedWorkoutsActivity extends Activity {
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             final Instance item = (Instance) parent.getItemAtPosition(position);
             Log.d("ad", item.toString());
-
             openContextMenu(view);
         }
     };
 
-
     @Override
     public void onCreateContextMenu(final ContextMenu menu, final View v, final ContextMenu.ContextMenuInfo menuInfo) {
         if (v.getId() == R.id.planned_list_view) {
-
             SubMenu subMenu = menu.addSubMenu("Podmień z bazy");
 
             for (int i = 0; i< routines.size(); i++) {
@@ -97,7 +83,6 @@ public class PlannedWorkoutsActivity extends Activity {
                 subMenu.add(MENU_INDEX_CHANGE, i, 0, routine.toString());
             }
 
-            AdapterView.AdapterContextMenuInfo info = (AdapterView.AdapterContextMenuInfo) menuInfo;
             SubMenu subMenu2 = menu.addSubMenu("Podmień z pliku");
             for (int i = 0; i < gpxFiles.length; i++) {
                 File file = gpxFiles[i];
@@ -109,8 +94,9 @@ public class PlannedWorkoutsActivity extends Activity {
 
     @Override
     public boolean onContextItemSelected(MenuItem item) {
-        if (lastMenuInfo == null)
-            lastMenuInfo = (AdapterView.AdapterContextMenuInfo)item.getMenuInfo();
+        if (lastMenuInfo == null) {
+            lastMenuInfo = (AdapterView.AdapterContextMenuInfo) item.getMenuInfo();
+        }
 
         int itemId = item.getItemId();
         int groupId = item.getGroupId();

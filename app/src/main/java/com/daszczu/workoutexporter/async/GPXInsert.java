@@ -2,27 +2,20 @@ package com.daszczu.workoutexporter.async;
 
 import android.app.Activity;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.os.AsyncTask;
-import android.os.Environment;
+import android.util.Log;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
-
-import com.daszczu.workoutexporter.PlannedWorkoutsActivity;
 import com.daszczu.workoutexporter.R;
 import com.daszczu.workoutexporter.dto.Instance;
 import com.daszczu.workoutexporter.managers.DatabaseManager;
 import com.daszczu.workoutexporter.mapsimporter.MapTrackPoint;
 import com.daszczu.workoutexporter.mapsimporter.MapsImporter;
-
-import org.xml.sax.SAXException;
 import org.xmlpull.v1.XmlPullParserException;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 public class GPXInsert extends AsyncTask<File, String, Void> {
     private Activity mActivity;
@@ -49,8 +42,8 @@ public class GPXInsert extends AsyncTask<File, String, Void> {
             try {
                 publishProgress("Reading GPX file... " + file.getCanonicalPath());
                 tracks = MapsImporter.getMapTracks(file);
-            } catch (SAXException | ParserConfigurationException | XmlPullParserException | IOException e) {
-                e.printStackTrace();
+            } catch (XmlPullParserException | IOException e) {
+                Log.e("GPXInsert", e.getLocalizedMessage(), e);
                 return null;
             }
         }

@@ -5,6 +5,9 @@ package com.daszczu.workoutexporter.constants;
  */
 
 public class Metrics {
+    private Metrics() {
+    }
+
     public static final int METRIC_DISTANCE = 4;
     public static final int METRIC_CALORIES = 13;
     public static final int METRIC_AVG_HR = 23;
