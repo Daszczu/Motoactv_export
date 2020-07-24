@@ -19,6 +19,8 @@
 
     <string name="title_activity_new_workout_planner">NewWorkoutPlannerActivity</string>
     <string name="activity_types_spinner">Activity type</string>
+    <string name="new_activity_title_hint">Insert title</string>
+    <string name="new_activity_description_hint">Insert description</string>
     <string-array name="activity_types">
         <item>Running</item>
         <item>Riding</item>

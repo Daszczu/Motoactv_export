@@ -27,6 +27,8 @@ import retrofit2.Call;
 import retrofit2.Response;
 
 public class RetrofitCalls {
+
+    private static final String TAG = "RetrofitCalls";
     private RetrofitConnection retrofitConnection;
     private Context ctx;
     private Headers headers;
@@ -41,8 +43,18 @@ public class RetrofitCalls {
     }
 
     public void login() throws IOException {
-        if (!checkOrEnableInternet())
+        login(0);
+    }
+
+    private void login(int i) throws IOException {
+        if (!checkOrEnableInternet()) {
+            Log.e("Retro", "Internet not available");
+            if (i == 0) {
+                return;
+            }
+            login(i + 1);
             return;
+        }
 
         MotoLoginRequest request = new MotoLoginRequest(motoLogin, motoPassword, "1");
 
@@ -51,40 +63,23 @@ public class RetrofitCalls {
         headers = response.headers();
     }
 
-    public void saveWorkoutPlan(WorkoutPlan workoutPlan) throws ParseException {
+    public String saveWorkoutPlan(WorkoutPlan workoutPlan) {
         if (!checkOrEnableInternet())
-            return;
+            return null;
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-//        WorkoutPlan workoutPlan = getExampleWorkoutPlan();
-
-        String cookies = headers.get("Set-Cookie");//.split(";")[0];
-        Log.d("RetrofitCall", gson.toJson(workoutPlan));
+        String cookies = headers.get("Set-Cookie");
         Call<MotoResponse> call = retrofitConnection.saveWorkoutPlan(gson.toJson(workoutPlan), cookies);
 
         try {
             Response<MotoResponse> response = call.execute();
-            Toast.makeText(ctx, response.toString(), Toast.LENGTH_LONG).show();
             MotoResponse motoResponse = response.body();
-            String asd = "";
+            Log.d(TAG, motoResponse.toString());
+            return response.toString();
         } catch (IOException e) {
-            Toast.makeText(ctx, e.getLocalizedMessage(), Toast.LENGTH_LONG).show();
-            Log.e("RetrofitCalls", e.getLocalizedMessage(), e);
+            Log.e(TAG, e.getLocalizedMessage(), e);
         }
-
-//        call.enqueue(new Callback<MotoResponse>() {
-//            @Override
-//            public void onResponse(Call<MotoResponse> call, Response<MotoResponse> response) {
-//
-//                Log.d("RetrofitCalls", "success");
-//            }
-//
-//            @Override
-//            public void onFailure(Call<MotoResponse> call, Throwable t) {
-//
-//                Log.d("RetrofitCalls", "failed");
-//            }
-//        });
+        return null;
     }
 
     private WorkoutPlan getExampleWorkoutPlan() throws ParseException {
@@ -136,7 +131,7 @@ public class RetrofitCalls {
                     Thread.sleep(500);
                 }
             } catch (InterruptedException e) {
-                Log.w("RetrofitCalls", e);
+                Log.w(TAG, e);
             }
             return isOnline;
         }

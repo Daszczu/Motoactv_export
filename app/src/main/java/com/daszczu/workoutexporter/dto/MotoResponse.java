@@ -1,10 +1,10 @@
 package com.daszczu.workoutexporter.dto;
 
 public class MotoResponse {
-    String routineId;
-    String workoutPlanId;
-    String return_url;
-    String code;
+    private String routineId;
+    private String workoutPlanId;
+    private String return_url;
+    private String code;
 
     public String getRoutineId() {
         return routineId;
@@ -36,5 +36,15 @@ public class MotoResponse {
 
     public void setCode(String code) {
         this.code = code;
+    }
+
+    @Override
+    public String toString() {
+        return "MotoResponse{" +
+                "routineId='" + routineId + '\'' +
+                ", workoutPlanId='" + workoutPlanId + '\'' +
+                ", return_url='" + return_url + '\'' +
+                ", code='" + code + '\'' +
+                '}';
     }
 }

@@ -15,8 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StravaManager {
-    private static final String LOGIN_URL = "https://strava-proxy.herokuapp.com/strava/login?client_secret=%s&code=%s;";
-    private static final String UPLOAD_URL = "https://strava-proxy.herokuapp.com/strava/upload?activity_type=%s";
+    private static final String BASE_URL = "http://ortalion.ddns.net:7848";
+    private static final String LOGIN_URL = BASE_URL + "/strava/login?client_secret=%s&code=%s";
+    private static final String UPLOAD_URL = BASE_URL + "/strava/upload";
     private static final String FILE_TYPE = "tcx";
     private Gson gson = new Gson();
     private String appSecret;
@@ -36,7 +37,8 @@ public class StravaManager {
                 null,
                 null);
 
-        return gson.fromJson(res.body(), StravaExchangeTokenResponse.class);
+        String responseString = res.body();
+        return gson.fromJson(responseString, StravaExchangeTokenResponse.class);
     }
 
     public StravaUploadResponse uploadActivity(File file, String token) throws IOException {
